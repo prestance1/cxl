@@ -1,0 +1,8 @@
+numpy
+pandas
+numba
+matplotlib
+numba_stats
+scipy
+scikit-learn
+torch
