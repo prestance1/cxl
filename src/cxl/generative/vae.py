@@ -7,11 +7,17 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 
 
+# A wrapped implementation of Yue et als original implementation
+# https://arxiv.org/pdf/1904.10098.pdf
+
+
 class Encoder(nn.Module):
 
     def __init__(
         self, n_in, n_xdims, n_hid, n_out, graph, batch_size, do_prob=0.0, factor=True
     ):
+        # https://arxiv.org/pdf/1904.10098.pdf
+
         super(Encoder, self).__init__()
 
         self.A = nn.Parameter(
@@ -45,6 +51,7 @@ class Encoder(nn.Module):
 
 
 class Decoder(nn.Module):
+    # https://arxiv.org/pdf/1904.10098.pdf
 
     def __init__(
         self,
@@ -92,6 +99,8 @@ class Decoder(nn.Module):
 
 
 def encode_onehot(labels):
+    # https://arxiv.org/pdf/1904.10098.pdf
+
     classes = set(labels)
     classes_dict = {c: np.identity(len(classes))[i, :] for i, c in enumerate(classes)}
     labels_onehot = np.array(list(map(classes_dict.get, labels)), dtype=np.int32)
@@ -99,11 +108,15 @@ def encode_onehot(labels):
 
 
 def matrix_poly(matrix, d):
+    # https://arxiv.org/pdf/1904.10098.pdf
+
     x = torch.eye(d).double() + torch.div(matrix, d)
     return torch.matrix_power(x, d)
 
 
 def nll_gaussian(preds, target, variance, add_const=False):
+    # https://arxiv.org/pdf/1904.10098.pdf
+
     mean1 = preds
     mean2 = target
     neg_log_p = variance + torch.div(
@@ -116,6 +129,7 @@ def nll_gaussian(preds, target, variance, add_const=False):
 
 
 def kl_gaussian_sem(preds):
+    # https://arxiv.org/pdf/1904.10098.pdf
     mu = preds
     kl_div = mu * mu
     kl_sum = kl_div.sum()
@@ -127,11 +141,13 @@ from torch.utils.data import DataLoader
 
 
 class CGNNLearner:
+    # https://arxiv.org/pdf/1904.10098.pdf
 
     def __init__(self, verbose=False) -> None:
         self.verbose = verbose
 
     def fit(self, data) -> NDArray:
+        # https://arxiv.org/pdf/1904.10098.pdf
 
         batch_size = 100
         feat_train = torch.FloatTensor(data)
