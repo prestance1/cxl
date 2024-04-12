@@ -18,6 +18,8 @@ dependencies = [
     "scipy",
     "scikit-learn",
     "torch",
+    "tqdm",
+    "networkx"
 ]
 readme = "README.md"
 description = "A unified library for causal discovery"
