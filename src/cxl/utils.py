@@ -60,7 +60,20 @@ def benchmark(func):
 
 
 def monitor_memory(func):
-    pass
+    def wrapped(*args, **kwargs):
+        tracemalloc.start()
+        snap1 = tracemalloc.take_snapshot()
+        res = func(*args, **kwargs)
+        snap2 = tracemalloc.take_snapshot()
+        memory_diff = snap2.compare_to(snap1, "traceback")
+        total_memory_allocated = sum(
+            stat.size_diff for stat in memory_diff if stat.size_diff > 0
+        )
+        tracemalloc.stop()
+        print(f"consumed a total amount of {total_memory_allocated} bytes")
+        return res
+
+    return wrapped
 
 
 def precision(predicted, ground_truth):
@@ -78,7 +91,7 @@ def recall(predicted, ground_truth):
 def f1(predicted, ground_truth):
     rc = recall(predicted, ground_truth)
     pre = precision(predicted, ground_truth)
-    return 2 * ((rc * precision) / (rc + pre))
+    return 2 * ((rc * pre) / (rc + pre))
 
 
 def g_score(predicted, ground_truth):

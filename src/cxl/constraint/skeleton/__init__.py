@@ -29,7 +29,7 @@ def create_skeleton_learner(
         return CPUSkeletonLearner(alpha, max_depth, indep_tester_factory, verbose)
     if hardware_config.compute_backend == ComputeBackend.MULTICORE:
         return ParallelSkeletonLearner(
-            alpha, max_depth, hardware_config, indep_tester_factory, verbose
+            hardware_config, alpha, max_depth, indep_tester_factory, verbose
         )
     elif hardware_config.compute_backend == ComputeBackend.GPU:
         return GPUSkeletonLearner(alpha, max_depth, verbose)
