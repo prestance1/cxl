@@ -88,6 +88,7 @@ class FCILearner:
         while modified:
             modified = any(rule(graph, sepset=separation_sets) for rule in rules)
         if self.selection_bias:
+            modified = True
             rules = [r5, r6, r7]
             while modified:
                 modified = any(rule(graph) for rule in rules)

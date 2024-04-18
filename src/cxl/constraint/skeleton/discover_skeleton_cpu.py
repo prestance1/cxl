@@ -2,6 +2,7 @@ from numpy.typing import NDArray
 from .utils import get_max_depth
 from cxl.graph.graph_utils import (
     create_complete_graph,
+    max_number_of_neighbors,
     is_disconnected,
     adj,
     remove_edge,
@@ -65,6 +66,9 @@ class CPUSkeletonLearner:
         separation_sets = {}
         graph = create_complete_graph(no_variables)
         for depth in (t := tqdm(range(max_depth + 1), disable=not self.verbose)):
+            if max_number_of_neighbors(graph) - 1 < depth:
+                break
+
             for x, y in itertools.combinations(range(no_variables), 2):
                 if is_disconnected(graph, x, y):
                     continue

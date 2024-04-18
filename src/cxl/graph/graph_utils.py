@@ -432,3 +432,11 @@ def get_all_edges(graph: NDArray, mark=1):
     for i, j in itertools.combinations(range(n), 2):
         if graph[i, j] == mark:
             yield (i, j)
+
+
+def max_number_of_neighbors(adjacency_matrix):
+    # Sum along the rows to get the number of neighbors for each node
+    neighbors_count = np.sum(adjacency_matrix, axis=1)
+    # Find the maximum number of neighbors
+    max_neighbors = np.max(neighbors_count)
+    return max_neighbors

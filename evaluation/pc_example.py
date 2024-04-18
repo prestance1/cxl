@@ -4,11 +4,14 @@ import numpy as np
 import pandas as pd
 
 
+def prepare_data():
+    pass
+
+
 def main():
+    X, ground_truth = prepare_data()
     learner = PCLearner()
-    observations, _ = generate_linear_gaussian(1000)
-    graph = learner.fit(observations)
-    pretty_print_graph(graph)
+    graph = learner.fit(X)
 
 
 if __name__ == "__main__":

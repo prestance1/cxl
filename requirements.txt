@@ -6,3 +6,5 @@ numba_stats
 scipy
 scikit-learn
 torch
+tqdm
+networkx

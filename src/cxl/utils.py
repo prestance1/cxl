@@ -13,17 +13,15 @@ def generate_linear_gaussian(n_samples: int) -> tuple[NDArray, NDArray]:
 
     p = np.random.randn(n_samples)
     q = np.random.randn(n_samples)
-    o = (1 * p) + np.random.randn(n_samples)
     r = p + q + 0.1 * np.random.randn(n_samples)
     s = 0.7 * r + 0.1 * np.random.randn(n_samples)
 
-    ground_truth = create_empty_graph(5)
+    ground_truth = create_empty_graph(4)
     ground_truth[0, 2] = 1
-    ground_truth[0, 3] = 1
-    ground_truth[1, 3] = 1
-    ground_truth[3, 4] = 1
+    ground_truth[1, 2] = 1
+    ground_truth[2, 3] = 1
 
-    return np.vstack([p, q, o, r, s]).T, ground_truth
+    return np.vstack([p, q, r, s]).T, ground_truth
 
 
 def generate_linear_gaussian_p(no_variables, n_samples):
@@ -194,6 +192,8 @@ def plot_adjacency_matrices_side_by_side(adj_matrix1, adj_matrix2) -> None:
     plt.show()
 
 
-if __name__ == "__main__":
-    mtx = np.array([[0, 1], [1, 0]])
-    plot_adjacency_matrices_side_by_side(mtx, mtx)
+def generate_independent_data(variables, samples):
+    cols = []
+    for _ in range(variables):
+        cols.append(np.random.randn(samples))
+    return np.vstack(cols).T

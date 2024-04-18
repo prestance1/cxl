@@ -2,6 +2,7 @@ from numpy.typing import NDArray
 from cxl.graph.graph_utils import (
     create_complete_graph,
     adj,
+    max_number_of_neighbors,
     remove_edge,
     find_unshielded_triples,
     get_all_edges,
@@ -77,26 +78,35 @@ class ParallelSkeletonLearner:
         m, no_variables = observations.shape
         separation_sets = {}
         graph = create_complete_graph(no_variables)
-
         max_depth = (
             get_max_depth(no_variables) if self.max_depth is None else self.max_depth
         )
         with self.executor:
             for depth in (t := tqdm(range(max_depth + 1), disable=not self.verbose)):
+                if max_number_of_neighbors(graph) - 1 < depth:
+                    break
                 J = list(get_all_edges(graph))
-                batch_size = int(math.ceil(len(J) / self.max_workers))
-                batches = list(itertools.batched(J, batch_size))
-                run_mini_pc = functools.partial(
-                    run_pc_at_depth, depth=depth, indep_tester=indep_tester, graph=graph
-                )
-                t.set_description(f"executing level {depth}")
-                results = self.executor.map(
-                    run_mini_pc, batches
-                )  # distribute tasks to workers
-                # sync results
-                t.set_description("synchronising results")
+                if len(J) > 1000:
+                    batch_size = int(math.ceil(len(J) / self.max_workers))
+                    batches = list(itertools.batched(J, batch_size))
+                    run_mini_pc = functools.partial(
+                        run_pc_at_depth,
+                        depth=depth,
+                        indep_tester=indep_tester,
+                        graph=graph,
+                    )
+                    t.set_description(f"executing level {depth}")
+                    results = self.executor.map(
+                        run_mini_pc, batches
+                    )  # distribute tasks to workers
 
-                for x, y, z in itertools.chain(*results):
+                    results = itertools.chain(*results)
+                    # sync results
+                else:
+                    results = run_pc_at_depth(J, depth, indep_tester, graph)
+
+                t.set_description("synchronising results")
+                for x, y, z in results:
                     remove_edge(graph, x, y)
                     separation_sets[(x, y)] = z
                     separation_sets[(y, x)] = z
